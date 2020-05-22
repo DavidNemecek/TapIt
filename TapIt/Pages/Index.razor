@@ -1,0 +1,66 @@
+﻿@page "/"
+@using System.Diagnostics
+@using System.Threading
+@using Data;
+@inject BrowserService Service
+
+
+@if (_screen == null)
+{
+    <p><em>Loading</em></p>
+}
+else if (!_watch.IsRunning)
+{
+    <div>
+        Gratuliere! <br/>
+        Benötigte Zeit: @_watch.Elapsed.ToString()
+    </div>
+}
+else
+{
+    <svg height="@_screen.Height" width="@_screen.Width">
+
+        @foreach (var circle in _screen.Circles)
+        {
+            <circle cx="@circle.X" cy="@circle.Y" r="@circle.Size" fill="@circle.Fill" @onclick="() => CircleClicked(circle)" />
+        }
+    </svg>
+}
+
+@code
+{
+    readonly Stopwatch _watch = new Stopwatch();
+    Screen _screen;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        //To not render it all over again and again -> do it just the first time
+        if (!firstRender) return;
+
+        //Get Dimensions from the Screen 
+        var dimension = await Service.GetDimensions();
+        _screen = new Screen(dimension.Width, dimension.Height);
+
+        //Add 5 Circles which have to be tapped
+        for (int i = 0; i < 5; i++)
+        {
+            _screen.Circles.Add(Circle.RandomCircleGenerator(_screen));
+        }
+
+        //Start Stopwatch
+        _watch.Start();
+        StateHasChanged();
+    }
+
+    private void CircleClicked(Circle circle)
+    {
+        //Remove Circle from Circle List
+        _screen.Circles.Remove(circle);
+
+        //If all Circles are tapped -> game is over
+        if (_screen.Circles.Count == 0)
+        {
+            _watch.Stop();
+        }
+    }
+}
