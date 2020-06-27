@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace TapIt
+namespace TapItWA
 {
     public class Startup
     {
@@ -21,7 +21,6 @@ namespace TapIt
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddScoped<BrowserService>(); // scoped service
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
